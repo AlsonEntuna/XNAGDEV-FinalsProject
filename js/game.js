@@ -5,6 +5,7 @@ var CANVAS_WIDTH = 500;
 var CANVAS_HEIGHT = 500;
 var FPS = 30;
 var GRAVITY = 9.8 * 0.075;
+var ACCELERATION = 0.75;
 
 /*var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
@@ -35,7 +36,7 @@ var bg =
 };
 
 // set the sprite
-bg.sprite = Sprite("bg2");
+bg.sprite = Sprite("candyBG");
 
 bg.draw = function()
 {
@@ -51,6 +52,8 @@ var playerGO =
     height: 30,
     width: 70,
     currentColor: "Blue",
+    xVelocity: 0,
+
    draw: function()
    {
        canvas.fillStyle = this.color;
@@ -71,9 +74,9 @@ playerGO.draw = function ()
 {
     this.sprite.draw(canvas, this.x, this.y);
 
-    if (this.currentColor == "Blue") playerGO.sprite = Sprite("Player");
-    if (this.currentColor == "Red") playerGO.sprite = Sprite("enemy2");
-    if (this.currentColor == "Yellow") playerGO.sprite = Sprite("ship2");
+    if (this.currentColor == "Blue") playerGO.sprite = Sprite("blueBasket");
+    if (this.currentColor == "Red") playerGO.sprite = Sprite("redBasket");
+    if (this.currentColor == "Yellow") playerGO.sprite = Sprite("yellowBasket");
 };
 
 // Player midpoint function
@@ -136,9 +139,9 @@ function Enemy(I)
         canvas.fillRect(this.x, this.y, this.width, this.height);*/
         this.sprite.draw(canvas, this.x, this.y);
 
-        if (I.currentColor == "Blue") I.sprite = Sprite("player");
-        if (I.currentColor == "Red")I.sprite = Sprite("enemy3");
-        if (I.currentColor == "Yellow")I.sprite = Sprite("ship2");
+        if (I.currentColor == "Blue") I.sprite = Sprite("blueCandy");
+        if (I.currentColor == "Red")I.sprite = Sprite("redCandy");
+        if (I.currentColor == "Yellow")I.sprite = Sprite("yellowCandy");
     };
 
     I.fallVelocity = function()
@@ -175,6 +178,7 @@ function Enemy(I)
 var score = 0;
 var playerLife = 3;
 var canChange = true;
+var isMoving = false;
 var colorIndex = 0;
 
 function playerIsAlive()
@@ -208,7 +212,7 @@ function draw()
     });
 
     // Render the score
-    canvas.fillStyle = "rgb(250, 250, 250)";
+    canvas.fillStyle = "rgb(0, 0, 0)";
     canvas.font = "24px Courier";
     canvas.textAlign = "left";
     canvas.textBaseline = "top";
@@ -264,6 +268,7 @@ function checkCollision()
 function update() 
 {
     if (!playerIsAlive()) return;
+    playerGO.x += playerGO.xVelocity;
 
     // Player GO Controls//
     // Player Movement
@@ -289,10 +294,16 @@ function update()
     }
 
     if(keydown.left) 
-        playerGO.x -= 5;
+        playerGO.xVelocity -= ACCELERATION;
 
     if(keydown.right)
-        playerGO.x += 5;
+        playerGO.xVelocity += ACCELERATION;
+
+    if(!keydown.left && !keydown.right)
+    {
+        if (playerGO.xVelocity > 0) playerGO.xVelocity -= ACCELERATION;
+        if (playerGO.xVelocity < 0) playerGO.xVelocity += ACCELERATION;
+    }
 
     if (!canChange)
     {
@@ -319,7 +330,7 @@ function update()
     });
 
     // Spawning algorithm for the enemies
-    if (Math.random() < 0.1) // you can change the time interval
+    if (Math.random() < 0.025) // you can change the time interval
         enemyList.push(Enemy());
     
     // Update the collision detection
