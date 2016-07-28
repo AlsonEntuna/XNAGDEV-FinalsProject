@@ -48,7 +48,7 @@ var playerGO =
 {
     color: "#00A",
     x: 50,
-    y: 400,
+    y: 385,
     height: 30,
     width: 70,
     currentColor: "Blue",
@@ -67,7 +67,7 @@ playerGO.changeColor = function(newColor)
 }
 
 // player sprite
-playerGO.sprite = Sprite("ship2");
+playerGO.sprite = Sprite("blueBasket");
 
 // Player Functions
 playerGO.draw = function ()
@@ -168,7 +168,7 @@ function Enemy(I)
     {
         this.active = false;
         // Add sound effect of explosion here
-        Sound.play("explosion");
+        //Sound.play("explosion");
     };
 
     return I;
@@ -213,18 +213,23 @@ function draw()
 
     // Render the score
     canvas.fillStyle = "rgb(0, 0, 0)";
-    canvas.font = "24px Courier";
+    canvas.font = "14px Courier";
     canvas.textAlign = "left";
     canvas.textBaseline = "top";
-    canvas.fillText("Score: " + score, 32, 32);
+    canvas.fillText("Score: " + score, 16, 16);
 
     // Render the PlayerLife
     canvas.textAlign = "bottom";
-    canvas.fillText("Life: " + playerLife, 32, 60);
+    canvas.fillText("Life: " + playerLife, 16, 30);
 
     // Render Current Color
     canvas.textAlign = "bottom";
-    canvas.fillText("Current Color: " + playerGO.currentColor, 32, 90);
+    canvas.fillText("Current Color: " + playerGO.currentColor, 16, 44);
+
+    canvas.font = "16px Courier";
+    canvas.textAlign = "bottom";
+    canvas.fillText("Press [Up] or [Down] to change colors", 75, 450);
+    canvas.fillText("Press [Left] or [Right] to move", 100, 475);
 
     if (playerLife <= 0)
     {
@@ -254,8 +259,16 @@ function checkCollision()
     {
         if (handleCollision(enemy, playerGO))
         {
-            if (enemy.currentColor == playerGO.currentColor) score++;
-            else playerLife--;
+            if (enemy.currentColor == playerGO.currentColor)
+            {
+                score++;
+                Sound.play("ding");
+            }
+            else
+            {
+                playerLife--;
+                Sound.play("buzz");
+            }
 
             enemy.explode();
             console.log("Life: " + playerLife);
@@ -301,8 +314,15 @@ function update()
 
     if(!keydown.left && !keydown.right)
     {
-        if (playerGO.xVelocity > 0) playerGO.xVelocity -= ACCELERATION;
-        if (playerGO.xVelocity < 0) playerGO.xVelocity += ACCELERATION;
+        if (playerGO.xVelocity > 0) {
+            playerGO.xVelocity -= ACCELERATION;
+            if (playerGO.xVelocity < 0) playerGO.xVelocity = 0;
+        }
+
+        if (playerGO.xVelocity < 0) {
+            playerGO.xVelocity += ACCELERATION;
+            if (playerGO.xVelocity > 0) playerGO.xVelocity = 0;
+        }
     }
 
     if (!canChange)
@@ -339,12 +359,12 @@ function update()
 
 // BGM
 if (playerIsAlive())
-    Sound.play("bgm");
+    Sound.play("Hopscotch");
 else
 {
     Sound.stop("test");
     // Player GO
-    Sound.play("bgm");
+    Sound.play("Hopscotch");
 }
 
 // Cross browser support for the request animation frame
